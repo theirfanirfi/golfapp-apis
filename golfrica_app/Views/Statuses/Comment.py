@@ -30,6 +30,7 @@ class Comment(FlaskView):
 
     @route("/status/<int:status_id>/")
     def status_comments(self, status_id):
+
         user = AuthorizeRequest(request.headers)
         if not user:
             return jsonify(notLoggedIn)

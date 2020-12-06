@@ -4,6 +4,26 @@ from datetime import datetime
 from random import random
 from sqlalchemy.orm import class_mapper
 import sqlalchemy
+import json
+from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy_serializer import SerializerMixin
+
+class AlchemyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj.__class__, DeclarativeMeta):
+            # an SQLAlchemy class
+            fields = {}
+            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata' and not x.startswith('query')]:
+                data = obj.__getattribute__(field)
+                try:
+                    json.dumps(data) # this will fail on non-encodable values, like other classes
+                    fields[field] = data
+                except TypeError:
+                    fields[field] = None
+            # a json-encodable dict
+            return fields
+
+        return json.JSONEncoder.default(self, obj)
 
 class User(db.Model):
     __tablename__ = "users"
@@ -109,7 +129,7 @@ class StatusSchema(ma.Schema):
         if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
         fields = fields + [prop.key for prop in class_mapper(Club).iterate_properties
         if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
-        fields = fields + ['total_likes', 'total_swaps', 'total_comments']
+        fields = fields + ['total_likes', 'total_swaps', 'total_comments','avg_rating']
 
 
 class Country(db.Model):
@@ -169,6 +189,7 @@ class CommentSchema(ma.Schema):
     class Meta:
         fields = [prop.key for prop in class_mapper(Comment).iterate_properties
         if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+
         fields = fields + ['user_id','profile_image', 'first_name','last_name']
 
 class Swap(db.Model):

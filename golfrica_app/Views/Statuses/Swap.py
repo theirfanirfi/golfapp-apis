@@ -26,11 +26,12 @@ class Swap(FlaskView):
 
     @route("/status/<int:status_id>/")
     def swap_status(self, status_id):
-        print(request.headers)
         user = AuthorizeRequest(request.headers)
         if not user:
             return jsonify(notLoggedIn)
         isFound, status = self.sbl.getStatusByIdObject(status_id)
+        print(status.status_id)
+
         if not isFound:
             self.response.update({
                 "isSwaped": False,

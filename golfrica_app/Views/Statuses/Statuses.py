@@ -1,13 +1,16 @@
 from flask import jsonify, request
 from flask_classful import FlaskView, route
-
+from golfrica_app.Models.models import AlchemyEncoder
 from golfrica_app.BusinessLogic.StatusesBL import StatusesBL
 from golfrica_app.BusinessLogic.UsersBL import UsersBL
+from golfrica_app.BusinessLogic.CommentBL import CommentBL
 from golfrica_app.Globals.JSONResponses import AuthorizeRequest, notLoggedIn, dataSavedResponse, dataNotSavedResponse
+import json
 class Statuses(FlaskView):
     response = dict({"isLoggedIn": True})
     bl = StatusesBL()
     ubl = UsersBL()
+    cbl = CommentBL()
     def index(self):
         user = AuthorizeRequest(request.headers)
         if not user:
@@ -17,11 +20,26 @@ class Statuses(FlaskView):
         return self.response
 
     def get(self, id):
-        user = AuthorizeRequest(request.headers)
-        if not user:
-            return jsonify(notLoggedIn)
+        # user = AuthorizeRequest(request.headers)
+        # if not user:
+        #     return jsonify(notLoggedIn)
 
-        self.response.update({"country": self.bl.getCountryById(id)})
+        status = self.bl.getStatusByIdAsJsonDump(id)
+        if not status:
+            self.response.update({
+                "isFound": False,
+                "message": 'No such status found',
+                "msg_type": 'error'
+            })
+
+        status_comments = self.cbl.getStatusComments(id)
+        self.response.update({
+            "isFound": False,
+            "status": status,
+            "comments": status_comments,
+            "message": 'loading',
+            "msg_type": 'info'
+        })
         return jsonify(self.response)
 
     @route("/like_status/<int:status_id>/")

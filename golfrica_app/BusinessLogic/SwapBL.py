@@ -12,7 +12,8 @@ class SwapBL:
             swaped_with = status.club_id
         elif status.is_player_status == 1:
             swaped_with = status.player_id
-        return False, 'Invalid status', 'error'
+        else:
+            return False, 'Invalid status', 'error'
 
         isAlreadySwapped, swap = self.getSwap(user, status, swaped_with)
         if isAlreadySwapped:

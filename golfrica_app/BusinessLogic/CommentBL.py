@@ -1,11 +1,13 @@
 from golfrica_app.Models.models import Comment, CommentSchema
 from datetime import datetime
 from golfrica_app import db
-from flask import escape
+from flask import escape, jsonify
 from sqlalchemy import text
 from golfrica_app.CoreClasses.Escape import escape_string
+# from golfrica_app.BusinessLogic.StatusesBL import StatusesBL
 class CommentBL:
     cs = CommentSchema(many=True)
+    # sbl = StatusesBL()
 
     def commentStatus(self,user, status, comment, rating):
         com = Comment()
@@ -39,7 +41,14 @@ class CommentBL:
     def getStatusComments(self, status_id):
         sql = text("SELECT * FROM comments LEFT JOIN users on users.user_id = comments.user_id WHERE status_id= '"+str(status_id)+"'")
         comments = db.engine.execute(sql)
-        return self.cs.dumps(comments)
+        return ({'comments': [dict(row) for row in comments]})
+
+    def getStatusCommentsWithClubProfile(self, status_id):
+        pass
+    def getStatusCommentsWithPlayerProfile(self, status_id):
+        pass
+    def getStatusCommentsWithAppUserProfile(self, status_id):
+        pass
 
     def getCommentByIdWithUserDetails(self, comment_id):
         sql = text("SELECT * FROM comments LEFT JOIN users on users.user_id = comments.user_id WHERE comments.comment_id= '"+str(comment_id)+"'")
