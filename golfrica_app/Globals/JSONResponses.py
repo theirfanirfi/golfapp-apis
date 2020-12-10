@@ -32,6 +32,12 @@ dataNotSavedResponse = dict({
     'isSaved': False,
 })
 
+invalidArgsResponse = dict({
+    "isLoggedIn": True,
+    "isError": True,
+    'message': 'Invalid data',
+})
+
 def AuthorizeRequest(headers):
     if not 'Authorization' in headers:
         return False
@@ -69,4 +75,15 @@ def get_decoded(data):
     except:
         return False
 
+def b64_to_data(data):
+    data = str(data).encode('ascii')
+    missing_padding = len(data) % 4
+    if missing_padding:
+        return False
+
+    try:
+        data = b64decode(data)
+        return data
+    except:
+        return False
 

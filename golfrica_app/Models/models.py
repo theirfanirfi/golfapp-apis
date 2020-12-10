@@ -122,6 +122,19 @@ class Club(db.Model):
 
     ##not part of the model
 
+class ClubDescription(db.Model):
+    __tablename__ = "club_description"
+    des_id = db.Column(db.Integer, primary_key=True)
+    des_text = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, default=0)
+    club_id = db.Column(db.Integer, default=0)
+    des_media = db.Column(db.Text, nullable=True)
+
+class ClubDesSchema(ma.Schema):
+    class Meta:
+        fields = [prop.key for prop in class_mapper(ClubDescription).iterate_properties
+        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+        fields = fields + ['first_name', 'last_name', 'profile_image']
 
 class StatusSchema(ma.Schema):
     class Meta:
@@ -219,6 +232,36 @@ class SwapSchema(ma.Schema):
     class Meta:
         fields = [prop.key for prop in class_mapper(Swap).iterate_properties
         if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+
+class Rating(db.Model):
+    __tablename__ = "ratings"
+    rating_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, default=0)
+    is_club_rating = db.Column(db.Integer, default=0)
+    is_player_rating = db.Column(db.Integer, default=0)
+    club_id = db.Column(db.Integer, default=0)
+    player_id = db.Column(db.Integer, default=0)
+    rating = db.Column(db.Float, default=0.0)
+    review = db.Column(db.Text, nullable=True)
+
+class RatingSchema(ma.Schema):
+    class Meta:
+        fields = [prop.key for prop in class_mapper(Rating).iterate_properties
+        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+
+class Follow(db.Model):
+    __tablename__ = "follows"
+    f_id = db.Column(db.Integer, primary_key=True)
+    follower_id = db.Column(db.Integer, default=0)
+    followed_id = db.Column(db.Integer, default=0)
+    is_club_followed = db.Column(db.Integer, default=0)
+    is_player_followed = db.Column(db.Integer, default=0)
+    is_user_followed = db.Column(db.Integer, default=0)
+    rating = db.Column(db.Float, default=0.0)
+
+
+
+
 
 
 

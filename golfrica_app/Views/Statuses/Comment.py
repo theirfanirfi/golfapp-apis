@@ -47,7 +47,6 @@ class Comment(FlaskView):
         if not user:
             return jsonify(notLoggedIn)
         data = get_decoded(request.form['data'])
-        print(data)
         if not data:
             self.response.update({
                 "isCommented": False,

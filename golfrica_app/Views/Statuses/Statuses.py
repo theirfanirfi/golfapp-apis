@@ -20,9 +20,9 @@ class Statuses(FlaskView):
         return self.response
 
     def get(self, id):
-        # user = AuthorizeRequest(request.headers)
-        # if not user:
-        #     return jsonify(notLoggedIn)
+        user = AuthorizeRequest(request.headers)
+        if not user:
+            return jsonify(notLoggedIn)
 
         status = self.bl.getStatusByIdAsJsonDump(id)
         if not status:

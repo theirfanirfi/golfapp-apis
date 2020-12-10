@@ -1,11 +1,12 @@
-from golfrica_app.Models.models import Club, ClubSchema
+from golfrica_app.Models.models import Club, ClubSchema, ClubDesSchema
 from datetime import datetime
-from golfrica_app.Models.models import Country
+from golfrica_app.Models.models import ClubDescription
 from golfrica_app import db
-from sqlalchemy import or_
+from sqlalchemy import or_, text
 
 class ClubsBL:
     cs = ClubSchema(many=True)
+    cds = ClubDesSchema(many=True)
 
     def getClubs(self):
         clubs= Club.query.all()
@@ -20,6 +21,18 @@ class ClubsBL:
         if club.count() > 0:
             self.cs.many = False
             return self.cs.dump(club.first())
+        return False
+
+    def getClubDescriptionWithUsers(self, club_id):
+        sql = text("select club_description.*, profile_image, first_name, last_name from club_description "
+                   "left join users on users.user_id = club_description.user_id Where club_id = '"+str(club_id)+"' ORDER BY des_id DESC ")
+        club_descriptions = db.engine.execute(sql)
+        return self.cds.dump(club_descriptions)
+
+    def getClubObjById(self, id):
+        club = Club.query.filter_by(club_id=id)
+        if club.count() > 0:
+            return club.first()
         return False
 
     def getClubByName(self, name):
@@ -48,6 +61,26 @@ class ClubsBL:
             return True, self.cs.dump(club)
         except Exception as ex:
             return False, str(ex)
+
+
+    def addClubDescriptoin(self, user, club_id, desc):
+        club = self.getClubObjById(club_id)
+        if not club:
+            return False, 'Club not found', 'error'
+
+        cd = ClubDescription()
+        cd.club_id = club.club_id
+        cd.user_id = user.user_id
+        cd.des_text = desc
+
+        try:
+            db.session.add(cd)
+            db.session.commit()
+            return True, 'Club description updated', 'success'
+        except:
+            return False, 'Error occurred in updating club description', 'error'
+
+
 
 
 
