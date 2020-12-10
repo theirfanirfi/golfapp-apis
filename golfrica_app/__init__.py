@@ -32,6 +32,7 @@ from golfrica_app.Views.Like import Like
 from golfrica_app.Views.Statuses.Comment import Comment
 from golfrica_app.Views.Statuses.Swap import Swap
 from golfrica_app.Views.Clubs.Rating import Rating
+from golfrica_app.Views.Clubs.Follow import Follow
 
 
 migrate = Migrate(app, db)
@@ -44,5 +45,6 @@ Like.register(app)
 Comment.register(app)
 Swap.register(app)
 Rating.register(app)
+Follow.register(app)
 
 

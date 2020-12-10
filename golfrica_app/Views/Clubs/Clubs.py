@@ -25,7 +25,8 @@ class Clubs(FlaskView):
         if not user:
             return jsonify(notLoggedIn)
 
-        club = self.cl.getClubById(id)
+        club = self.cl.getClubProfile(id)
+        print(club)
         if not club:
             return jsonify(invalidArgsResponse)
 

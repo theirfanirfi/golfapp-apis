@@ -23,6 +23,15 @@ class ClubsBL:
             return self.cs.dump(club.first())
         return False
 
+    def getClubProfile(self, id):
+        sql = text("SELECT clubs.*, count(f_id) as followers FROM clubs LEFT JOIN follows on follows.followed_id = clubs.club_id AND follows.is_club_followed = 1 "
+                   "WHERE clubs.club_id = '"+str(id)+"'")
+        club = db.engine.execute(sql)
+        if club.rowcount > 0:
+            self.cs.many = False
+            return self.cs.dump(club.first())
+        return False
+
     def getClubDescriptionWithUsers(self, club_id):
         sql = text("select club_description.*, profile_image, first_name, last_name from club_description "
                    "left join users on users.user_id = club_description.user_id Where club_id = '"+str(club_id)+"' ORDER BY des_id DESC ")

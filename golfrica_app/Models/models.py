@@ -46,6 +46,8 @@ class User(db.Model):
         self.password = bcrypt.generate_password_hash(password)
         self.login_type = login_type
 
+
+
 class UserSchema(ma.Schema):
     class Meta:
         fields = [prop.key for prop in class_mapper(User).iterate_properties
@@ -163,6 +165,7 @@ class ClubSchema(ma.Schema):
     class Meta:
         fields = [prop.key for prop in class_mapper(Club).iterate_properties
         if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+        fields = fields + ['followers']
 
 
 class Like(db.Model):
@@ -258,6 +261,12 @@ class Follow(db.Model):
     is_player_followed = db.Column(db.Integer, default=0)
     is_user_followed = db.Column(db.Integer, default=0)
     rating = db.Column(db.Float, default=0.0)
+
+class FollowSchema(ma.Schema):
+    class Meta:
+        fields = [prop.key for prop in class_mapper(Follow).iterate_properties
+        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+        fields = fields + ['user_id','profile_image', 'first_name','last_name','is_followed','user_followers','users_followed']
 
 
 

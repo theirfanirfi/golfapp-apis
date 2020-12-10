@@ -3,8 +3,6 @@ from flask_classful import FlaskView, route
 
 from golfrica_app.BusinessLogic.RatingBL import RatingBL
 from golfrica_app.BusinessLogic.ClubsBL import ClubsBL
-from golfrica_app.BusinessLogic.SyncStatuses import SyncStatuses
-from golfrica_app.Models.models import Club
 from golfrica_app.Globals.JSONResponses import AuthorizeRequest, notLoggedIn, dataSavedResponse,\
     dataNotSavedResponse, b64_to_data, invalidArgsResponse, get_decoded
 
@@ -16,7 +14,7 @@ class Rating(FlaskView):
         pass
 
     @route("rate_club/<int:club_id>", methods=['GET', 'POST'])
-    def clubDescription(self, club_id):
+    def rate_club(self, club_id):
         user = AuthorizeRequest(request.headers)
         if not user:
             return jsonify(notLoggedIn)
