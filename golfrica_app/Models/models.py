@@ -165,7 +165,7 @@ class ClubSchema(ma.Schema):
     class Meta:
         fields = [prop.key for prop in class_mapper(Club).iterate_properties
         if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
-        fields = fields + ['followers']
+        fields = fields + ['followers','total_reviews','avg_rating','followers','is_followed']
 
 
 class Like(db.Model):
