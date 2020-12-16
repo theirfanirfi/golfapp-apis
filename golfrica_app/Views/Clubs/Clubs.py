@@ -17,7 +17,7 @@ class Clubs(FlaskView):
         if not user:
             return jsonify(notLoggedIn)
 
-        self.response.update({"clubs":self.cl.getClubs()})
+        self.response.update({"clubs":self.cl.getClubs(user)})
         return jsonify(self.response)
 
     def get(self, id):
@@ -26,7 +26,6 @@ class Clubs(FlaskView):
             return jsonify(notLoggedIn)
 
         club = self.cl.getClubProfile(id)
-        print(club)
         if not club:
             return jsonify(invalidArgsResponse)
 

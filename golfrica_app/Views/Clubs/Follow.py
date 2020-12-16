@@ -4,6 +4,7 @@ from golfrica_app.Models.models import User
 from golfrica_app.BusinessLogic.FollowBL import FollowBL
 from golfrica_app.BusinessLogic.ClubsBL import ClubsBL
 from golfrica_app.BusinessLogic.UsersBL import UsersBL
+from golfrica_app.BusinessLogic.PlayerBL import PlayerBL
 from golfrica_app.Globals.JSONResponses import AuthorizeRequest, notLoggedIn, dataSavedResponse,\
     dataNotSavedResponse, b64_to_data, invalidArgsResponse, get_decoded
 
@@ -12,6 +13,7 @@ class Follow(FlaskView):
     fl = FollowBL()
     cl = ClubsBL()
     ubl = UsersBL()
+    pbl = PlayerBL()
     def index(self):
         pass
 
@@ -63,5 +65,20 @@ class Follow(FlaskView):
             return jsonify(invalidArgsResponse)
 
         isFollowed, message, msg_type = self.fl.followUser(user, user_to_follow)
+        self.response.update({"isFollowed": isFollowed, "message": message, "msg_type": msg_type})
+        return jsonify(self.response)
+
+
+    @route("/player/<int:player_id>", methods=['GET', 'POST'])
+    def followUser(self, player_id):
+        user = AuthorizeRequest(request.headers)
+        if not user:
+            return jsonify(notLoggedIn)
+
+        player_to_follow = self.pbl.getPlayerObjById(player_id)
+        if not player_to_follow:
+            return jsonify(invalidArgsResponse)
+
+        isFollowed, message, msg_type = self.fl.followPlayer(user, player_to_follow)
         self.response.update({"isFollowed": isFollowed, "message": message, "msg_type": msg_type})
         return jsonify(self.response)

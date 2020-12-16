@@ -8,10 +8,10 @@ class ClubsBL:
     cs = ClubSchema(many=True)
     cds = ClubDesSchema(many=True)
 
-    def getClubs(self):
+    def getClubs(self, user):
         sql = text("SELECT clubs.*, count(f_id) as followers, "
                    "count(ratings.rating_id) as total_reviews, "
-                   "avg(ratings.rating) as avg_rating, IF(follows.follower_id = 1, true, false) as is_followed "
+                   "avg(ratings.rating) as avg_rating, IF(follows.follower_id = "+str(user.user_id)+", true, false) as is_followed "
                    "FROM clubs LEFT JOIN follows on follows.followed_id = clubs.club_id AND follows.is_club_followed = 1 "
                    "LEFT JOIN ratings on ratings.club_id = clubs.club_id "
                    "GROUP BY clubs.club_id, follows.follower_id")

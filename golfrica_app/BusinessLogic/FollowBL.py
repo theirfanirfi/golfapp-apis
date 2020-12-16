@@ -11,7 +11,12 @@ class FollowBL:
     def followClub(self, user, club):
         follow = self.checkUserHasFollowedClub(user, club)
         if follow:
-            return False, 'You have already followed the club', 'info'
+            try:
+                db.session.delete(follow)
+                db.session.commit()
+                return True, 'Club unfollowed', 'success'
+            except:
+                return False, 'error occurred in unfollowing the club', 'error'
 
         follow = Follow()
         follow.is_club_followed = 1
@@ -24,6 +29,28 @@ class FollowBL:
             return True, 'Club Followed', 'success'
         except:
             return False, 'Error occurred in following the club', 'error'
+
+    def followPlayer(self, user, player):
+        follow = self.checkUserHasFollowedPlayer(user, player)
+        if follow:
+            try:
+                db.session.delete(follow)
+                db.session.commit()
+                return False, 'Player unfollowed', 'success'
+            except:
+                return False, 'error occurred in unfollowing the player', 'error'
+
+        follow = Follow()
+        follow.is_player_followed = 1
+        follow.followed_id = player.player_id
+        follow.follower_id = user.user_id
+
+        try:
+            db.session.add(follow)
+            db.session.commit()
+            return True, 'Player Followed', 'success'
+        except:
+            return False, 'Error occurred in following the player.', 'error'
 
     def followUser(self, user, user_to_follow):
         follow = self.checkUserHasFollowedUser(user, user_to_follow)
@@ -48,9 +75,15 @@ class FollowBL:
             return False, 'Error occurred in following the user', 'error'
 
     def checkUserHasFollowedClub(self, user, club):
-        rating = Follow.query.filter_by(follower_id=user.user_id, followed_id=club.club_id, is_club_followed=1)
-        if rating.count() > 0:
-            return rating.first()
+        follow = Follow.query.filter_by(follower_id=user.user_id, followed_id=club.club_id, is_club_followed=1)
+        if follow.count() > 0:
+            return follow.first()
+        return False
+
+    def checkUserHasFollowedPlayer(self, user, player):
+        follow = Follow.query.filter_by(follower_id=user.user_id, followed_id=player.player_id, is_player_followed=1)
+        if follow.count() > 0:
+            return follow.first()
         return False
 
     def checkUserHasFollowedUser(self, user, user_to_follow):

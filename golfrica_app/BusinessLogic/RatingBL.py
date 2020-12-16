@@ -26,8 +26,32 @@ class RatingBL:
         except:
             return False, 'Error occurred in rating the club', 'error'
 
+    def ratePlayer(self, user, player, data):
+        rating = self.getUserRatingForPlayer(user, player)
+        if not rating:
+            rating = Rating()
+
+        rating.user_id = user.user_id
+        rating.rating = data['rating_stars']
+        rating.review = data['review']
+        rating.player_id = player.club_id
+        rating.is_player_rating = 1
+
+        try:
+            db.session.add(rating)
+            db.session.commit()
+            return True, rating.rating, 'success'
+        except:
+            return False, 'Error occurred in rating the club', 'error'
+
     def getUserRatingForClub(self, user, club):
         rating = Rating.query.filter_by(user_id=user.user_id, club_id=club.club_id, is_club_rating=1)
+        if rating.count() > 0:
+            return rating.first()
+        return False
+
+    def getUserRatingForPlayer(self, user, player):
+        rating = Rating.query.filter_by(user_id=user.user_id, player_id=player.player_id, is_player_rating=1)
         if rating.count() > 0:
             return rating.first()
         return False

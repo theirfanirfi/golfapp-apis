@@ -269,6 +269,32 @@ class FollowSchema(ma.Schema):
         fields = fields + ['user_id','profile_image', 'first_name','last_name','is_followed','user_followers','users_followed']
 
 
+class Player(db.Model):
+    __tablename__ = "players"
+    player_id = db.Column(db.Integer, primary_key=True)
+    player_name = db.Column(db.String(200), nullable=False)
+    club_id = db.Column(db.Integer, default=0)
+    email = db.Column(db.String(200), nullable=False)
+    player_profile_pic = db.Column(db.Text, nullable=True)
+    player_cover_pic = db.Column(db.Text, nullable=True)
+    web_link = db.Column(db.Text, nullable=True)
+    fb_link = db.Column(db.Text, nullable=True)
+    twitter_link = db.Column(db.Text, nullable=True)
+    instagram_link = db.Column(db.Text, nullable=True)
+    whatsapp_number = db.Column(db.String(50), nullable=True)
+    address = db.Column(db.Text, nullable=True)
+    postal_address = db.Column(db.String(100), nullable=True)
+    fb_followers = db.Column(db.Integer, nullable=True)
+    twitter_followers = db.Column(db.Integer, nullable=True)
+    insta_followers = db.Column(db.Integer, nullable=True)
+
+class PlayerSchema(ma.Schema):
+    class Meta:
+        fields = [prop.key for prop in class_mapper(Player).iterate_properties
+        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+        fields = fields + ['user_id','profile_image', 'first_name','last_name','is_followed','followers']
+
+
 
 
 
