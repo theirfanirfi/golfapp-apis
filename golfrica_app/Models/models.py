@@ -97,6 +97,7 @@ class Status(db.Model):
     status_sm_shares = db.Column(db.Integer, default=0)
     created_at = db.Column(db.String(50), nullable=True)
     updated_at = db.Column(db.String(50), nullable=True)
+    is_published = db.Column(db.String(50), default=0)
 
 
 class Club(db.Model):
@@ -235,6 +236,7 @@ class SwapSchema(ma.Schema):
     class Meta:
         fields = [prop.key for prop in class_mapper(Swap).iterate_properties
         if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+        fields = fields + ['first_name', 'last_name', 'swap_requests']
 
 class Rating(db.Model):
     __tablename__ = "ratings"
@@ -292,10 +294,19 @@ class PlayerSchema(ma.Schema):
     class Meta:
         fields = [prop.key for prop in class_mapper(Player).iterate_properties
         if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
-        fields = fields + ['user_id','profile_image', 'first_name','last_name','is_followed','followers']
+        fields = fields + ['user_id','profile_image', 'first_name','last_name','is_followed','followers', 'club_name','total_reviews','country_name']
 
-
-
+class Notification(db.Model):
+    __tablename__ = "notifications"
+    notification_id = db.Column(db.Integer, primary_key=True)
+    is_like = db.Column(db.Integer, default=0)
+    is_review = db.Column(db.Integer, default=0)
+    is_share = db.Column(db.Integer, default=0)
+    status_id = db.Column(db.Integer, default=0)
+    notifier_user_id = db.Column(db.Integer, default=0)
+    to_be_notified_user_id = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.String(50), nullable=True)
+    updated_at = db.Column(db.String(50), nullable=True)
 
 
 

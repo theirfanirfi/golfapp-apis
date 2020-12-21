@@ -5,7 +5,11 @@ from golfrica_app.BusinessLogic.StatusesBL import StatusesBL
 from golfrica_app.BusinessLogic.UsersBL import UsersBL
 from golfrica_app.BusinessLogic.CommentBL import CommentBL
 from golfrica_app.Globals.JSONResponses import AuthorizeRequest, notLoggedIn, dataSavedResponse, dataNotSavedResponse
+from datetime import datetime
 import json
+import os
+from werkzeug.utils import secure_filename
+from golfrica_app import app
 class Statuses(FlaskView):
     response = dict({"isLoggedIn": True})
     bl = StatusesBL()
@@ -123,6 +127,44 @@ class Statuses(FlaskView):
             return jsonify(dataSavedResponse)
         dataNotSavedResponse.update({"message": countryOrException})
         return jsonify(dataNotSavedResponse)
+
+    @route("/upload", methods=['GET','POST'])
+    def upload_media(self):
+        user = AuthorizeRequest(request.headers)
+        if not user:
+            return jsonify(notLoggedIn)
+
+        if request.method == "GET":
+            pass
+        elif request.method == "POST":
+            if request.form['status'] == "" and not request.files:
+                self.response.update({"isStatusPosted": False, "status": "Enter text or upload images."})
+                return jsonify(self.response)
+
+            data = {
+                'status': None,
+                'media': {'images': [], 'video': []},
+            }
+            media = list()
+            status_text = request.form['status']
+            data['status'] = status_text
+            if request.files:
+                files = request.files
+                images = files.getlist('images[]')
+                print("Images: ", len(images))
+                for image in images:
+                    dt_obj = datetime.strptime(str(datetime.now()),'%Y-%m-%d %H:%M:%S.%f')
+                    millisec = str(dt_obj.timestamp() * 1000)
+                    time = millisec.replace('.','')
+                    image_name = user.first_name+str(user.user_id)+time+'.jpg'
+                    media.append(image_name)
+                    image.save(os.path.join(app.config['UPLOAD_FOLDER']+'/user/status/', image_name))
+                data['media'] = {'images': media, 'video': []}
+            isStatusPosted, status = self.bl.addUserStatus(user, data)
+            self.response.update({"isStatusPosted": isStatusPosted, "status": status})
+            return jsonify(self.response)
+        else:
+            return 'invalid request'
 
     def delete(self, id):
         pass

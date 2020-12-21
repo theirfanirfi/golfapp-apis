@@ -96,6 +96,23 @@ class StatusesBL:
             return False, str(ex)
 
 
+    def addUserStatus(self, user, data):
+        status = Status()
+        try:
+            status.is_app_status = 1
+            status.user_id = user.user_id
+            status.status_description = data['status']
+            status.status_media = self.mediaLinksToJson(media=data['media'])
+            status.created_at = str(datetime.now())[:10]
+            status.updated_at = str(datetime.now())[:10]
+            db.session.add(status)
+            db.session.commit()
+            self.ss.many=False
+            return True, self.ss.dump(status)
+        except Exception as ex:
+            return False, str(ex)
+
+
 
 
 

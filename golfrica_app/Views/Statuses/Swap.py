@@ -100,3 +100,40 @@ class Swap(FlaskView):
 
     def delete(self, id):
         pass
+
+    def notifications(self):
+        user = AuthorizeRequest(request.headers)
+        if not user:
+            return jsonify(notLoggedIn)
+
+        isSwapNotificationsFound, swaps = self.bl.getSwapNotifications(user)
+        self.response.update({"isSwapNotificationsFound": isSwapNotificationsFound, "swaps": swaps})
+        return jsonify(self.response)
+
+    def approve(self, id):
+        user = AuthorizeRequest(request.headers)
+        if not user:
+            return jsonify(notLoggedIn)
+
+        swap = self.bl.getSwapObjectById(id)
+        if not swap:
+            self.response.update({"isSwapApproved": False, "message": 'Swap not found.','msg_type': 'error'})
+            return jsonify(self.response)
+
+        isSwapApproved, message, msg_type = self.bl.approveSwap(user, swap)
+        self.response.update({"isSwapApproved": isSwapApproved, "message": message, 'msg_type': msg_type})
+        return jsonify(self.response)
+
+    def decline(self, id):
+        user = AuthorizeRequest(request.headers)
+        if not user:
+            return jsonify(notLoggedIn)
+
+        swap = self.bl.getSwapObjectById(id)
+        if not swap:
+            self.response.update({"isSwapDeclined": False, "message": 'Swap not found.','msg_type': 'error'})
+            return jsonify(self.response)
+
+        isSwapDeclined, message, msg_type = self.bl.declineSwap(user, swap)
+        self.response.update({"isSwapDeclined": isSwapDeclined, "message": message, 'msg_type': msg_type})
+        return jsonify(self.response)
