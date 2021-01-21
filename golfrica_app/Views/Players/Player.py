@@ -3,8 +3,17 @@ from flask_classful import FlaskView, route
 from golfrica_app.Models.models import User
 from golfrica_app.BusinessLogic.PlayerBL import PlayerBL
 from golfrica_app.BusinessLogic.ClubsBL import ClubsBL
-from golfrica_app.Globals.JSONResponses import AuthorizeRequest, notLoggedIn, dataSavedResponse,\
-    dataNotSavedResponse, b64_to_data, invalidArgsResponse, get_decoded
+from golfrica_app.Factories.BLFactory import BL
+from golfrica_app.Globals.JSONResponses import (
+    AuthorizeRequest,
+    notLoggedIn,
+    dataSavedResponse,
+    dataNotSavedResponse,
+    b64_to_data,
+    invalidArgsResponse,
+    get_decoded,
+)
+
 
 class Player(FlaskView):
     response = dict({"isLoggedIn": True})
@@ -13,12 +22,6 @@ class Player(FlaskView):
 
     def index(self):
         pass
-        # user = AuthorizeRequest(request.headers)
-        # if not user:
-        #     return jsonify(notLoggedIn)
-        #
-        # self.response.update({"players":self.pl.getPlayers(user)})
-        # return jsonify(self.response)
 
     def get(self, id):
         user = AuthorizeRequest(request.headers)
@@ -29,8 +32,7 @@ class Player(FlaskView):
         if not club:
             return jsonify(invalidArgsResponse)
 
-
-        self.response.update({"players":self.pl.getPlayers(user, club)})
+        self.response.update({"players": BL.getBL("player").getPlayers(user, club)})
         return jsonify(self.response)
 
     @route("/profile/<int:player_id>")
@@ -39,13 +41,29 @@ class Player(FlaskView):
         if not user:
             return jsonify(notLoggedIn)
 
-        player = self.pl.getPlayerObjById(player_id)
+        player = BL.getBL("player").getPlayerObjById(player_id)
         if not player:
             return jsonify(invalidArgsResponse)
 
-        player = self.pl.getPlayeProfileAsDump(user, player)
-        self.response.update({"player": player});
+        player = BL.getBL("player").getPlayeProfileAsDump(user, player)
+        self.response.update({"player": player})
         return jsonify(self.response)
+
+    @route("/statuses/<int:player_id>/<int:offset>")
+    def statuses(self, player_id, offset):
+        user = AuthorizeRequest(request.headers)
+        if not user:
+            return jsonify(notLoggedIn)
+
+        app_offset = 0
+        offset = int(offset)
+        if offset > 0:
+            app_offset = offset * request.args.get("offset")
+
+        statuses = BL.getBL("status").getPlayerStatuses(user, player_id, app_offset)
+        self.response.update({"statuses": statuses})
+        return jsonify(self.response)
+
     #
     # @route("/club_followers/<int:club_id>")
     # def clubFollowers(self, club_id):

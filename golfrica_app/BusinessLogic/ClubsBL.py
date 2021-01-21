@@ -3,6 +3,7 @@ from datetime import datetime
 from golfrica_app.Models.models import ClubDescription
 from golfrica_app import db
 from sqlalchemy import or_, text
+from golfrica_app.Globals.ImageUpload import mediaLinksToJson
 
 class ClubsBL:
     cs = ClubSchema(many=True)
@@ -29,9 +30,8 @@ class ClubsBL:
             return self.cs.dump(club.first())
         return False
 
-    def getClubProfile(self, id):
-        sql = text("SELECT clubs.*, count(f_id) as followers FROM clubs LEFT JOIN follows on follows.followed_id = clubs.club_id AND follows.is_club_followed = 1 "
-                   "WHERE clubs.club_id = '"+str(id)+"'")
+    def getClubProfile(self, id, user):
+        sql = text("SELECT clubs.*, (select count(*) from follows where follows.followed_id = clubs.club_id AND follows.is_club_followed = 1 ) as followers, (select count(*) from follows where follows.followed_id = clubs.club_id AND follows.is_club_followed = 1 AND follows.follower_id = "+str(user.user_id)+") as is_followed, (select count(*) from players where players.club_id = clubs.club_id) as players, (select count(*) from statuses where statuses.club_id = clubs.club_id) as total_statuses FROM clubs WHERE clubs.club_id = "+str(id))
         club = db.engine.execute(sql)
         if club.rowcount > 0:
             self.cs.many = False
@@ -78,7 +78,7 @@ class ClubsBL:
             return False, str(ex)
 
 
-    def addClubDescriptoin(self, user, club_id, desc):
+    def addClubDescriptoin(self, user, club_id, desc, media):
         club = self.getClubObjById(club_id)
         if not club:
             return False, 'Club not found', 'error'
@@ -87,6 +87,7 @@ class ClubsBL:
         cd.club_id = club.club_id
         cd.user_id = user.user_id
         cd.des_text = desc
+        cd.des_media = mediaLinksToJson(media['media'])
 
         try:
             db.session.add(cd)
@@ -94,9 +95,3 @@ class ClubsBL:
             return True, 'Club description updated', 'success'
         except:
             return False, 'Error occurred in updating club description', 'error'
-
-
-
-
-
-

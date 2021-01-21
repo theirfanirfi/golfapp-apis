@@ -8,15 +8,24 @@ import json
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy_serializer import SerializerMixin
 
+
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj.__class__, DeclarativeMeta):
             # an SQLAlchemy class
             fields = {}
-            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata' and not x.startswith('query')]:
+            for field in [
+                x
+                for x in dir(obj)
+                if not x.startswith("_")
+                and x != "metadata"
+                and not x.startswith("query")
+            ]:
                 data = obj.__getattribute__(field)
                 try:
-                    json.dumps(data) # this will fail on non-encodable values, like other classes
+                    json.dumps(
+                        data
+                    )  # this will fail on non-encodable values, like other classes
                     fields[field] = data
                 except TypeError:
                     fields[field] = None
@@ -24,6 +33,7 @@ class AlchemyEncoder(json.JSONEncoder):
             return fields
 
         return json.JSONEncoder.default(self, obj)
+
 
 class User(db.Model):
     __tablename__ = "users"
@@ -46,12 +56,18 @@ class User(db.Model):
         self.password = bcrypt.generate_password_hash(password)
         self.login_type = login_type
 
+    def __init__(self):
+        pass
 
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = [prop.key for prop in class_mapper(User).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+        fields = [
+            prop.key
+            for prop in class_mapper(User).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+
 
 class LoginDevice(db.Model):
     __tablename__ = "login_devices"
@@ -70,11 +86,14 @@ class LoginDevice(db.Model):
         self.created_at = str(datetime.now())
         self.updated_at = updated_at
 
+
 class LoginDeviceSchema(ma.Schema):
     class Meta:
-        fields = [prop.key for prop in class_mapper(LoginDevice).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
-
+        fields = [
+            prop.key
+            for prop in class_mapper(LoginDevice).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
 
 
 class Status(db.Model):
@@ -121,9 +140,10 @@ class Club(db.Model):
     fb_followers = db.Column(db.Integer, nullable=True)
     twitter_followers = db.Column(db.Integer, nullable=True)
     insta_followers = db.Column(db.Integer, nullable=True)
-    coordinates = db.Column(db.String(200), nullable=True) #longitude and latitude
+    coordinates = db.Column(db.String(200), nullable=True)  # longitude and latitude
 
     ##not part of the model
+
 
 class ClubDescription(db.Model):
     __tablename__ = "club_description"
@@ -133,19 +153,60 @@ class ClubDescription(db.Model):
     club_id = db.Column(db.Integer, default=0)
     des_media = db.Column(db.Text, nullable=True)
 
+
+class Player(db.Model):
+    __tablename__ = "players"
+    player_id = db.Column(db.Integer, primary_key=True)
+    player_name = db.Column(db.String(200), nullable=False)
+    club_id = db.Column(db.Integer, default=0)
+    email = db.Column(db.String(200), nullable=False)
+    player_profile_pic = db.Column(db.Text, nullable=True)
+    player_cover_pic = db.Column(db.Text, nullable=True)
+    web_link = db.Column(db.Text, nullable=True)
+    fb_link = db.Column(db.Text, nullable=True)
+    twitter_link = db.Column(db.Text, nullable=True)
+    instagram_link = db.Column(db.Text, nullable=True)
+    whatsapp_number = db.Column(db.String(50), nullable=True)
+    address = db.Column(db.Text, nullable=True)
+    postal_address = db.Column(db.String(100), nullable=True)
+    fb_followers = db.Column(db.Integer, nullable=True)
+    twitter_followers = db.Column(db.Integer, nullable=True)
+    insta_followers = db.Column(db.Integer, nullable=True)
+
+
 class ClubDesSchema(ma.Schema):
     class Meta:
-        fields = [prop.key for prop in class_mapper(ClubDescription).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
-        fields = fields + ['first_name', 'last_name', 'profile_image']
+        fields = [
+            prop.key
+            for prop in class_mapper(ClubDescription).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+        fields = fields + ["first_name", "last_name", "profile_image"]
+
 
 class StatusSchema(ma.Schema):
     class Meta:
-        fields = [prop.key for prop in class_mapper(Status).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
-        fields = fields + [prop.key for prop in class_mapper(Club).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
-        fields = fields + ['total_likes', 'total_swaps', 'total_comments','avg_rating']
+        fields = [
+            prop.key
+            for prop in class_mapper(Status).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+        fields = fields + [
+            prop.key
+            for prop in class_mapper(User).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+        fields = fields + [
+            prop.key
+            for prop in class_mapper(Club).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+        fields = fields + [
+            prop.key
+            for prop in class_mapper(Player).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+        fields = fields + ["total_likes", "total_swaps", "total_comments", "avg_rating"]
 
 
 class Country(db.Model):
@@ -155,18 +216,32 @@ class Country(db.Model):
     created_at = db.Column(db.String(50), nullable=True)
     updated_at = db.Column(db.String(50), nullable=True)
 
+
 class CountrySchema(ma.Schema):
     class Meta:
-        fields = [prop.key for prop in class_mapper(Country).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
-
+        fields = [
+            prop.key
+            for prop in class_mapper(Country).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
 
 
 class ClubSchema(ma.Schema):
     class Meta:
-        fields = [prop.key for prop in class_mapper(Club).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
-        fields = fields + ['followers','total_reviews','avg_rating','followers','is_followed']
+        fields = [
+            prop.key
+            for prop in class_mapper(Club).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+        fields = fields + [
+            "followers",
+            "total_reviews",
+            "avg_rating",
+            "followers",
+            "is_followed",
+            "players",
+            "total_statuses",
+        ]
 
 
 class Like(db.Model):
@@ -182,10 +257,15 @@ class Like(db.Model):
     created_at = db.Column(db.String(50), nullable=True)
     updated_at = db.Column(db.String(50), nullable=True)
 
+
 class LikeSchema(ma.Schema):
     class Meta:
-        fields = [prop.key for prop in class_mapper(Like).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+        fields = [
+            prop.key
+            for prop in class_mapper(Like).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+
 
 class Comment(db.Model):
     __tablename__ = "comments"
@@ -202,12 +282,17 @@ class Comment(db.Model):
     created_at = db.Column(db.String(50), nullable=True)
     updated_at = db.Column(db.String(50), nullable=True)
 
+
 class CommentSchema(ma.Schema):
     class Meta:
-        fields = [prop.key for prop in class_mapper(Comment).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+        fields = [
+            prop.key
+            for prop in class_mapper(Comment).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
 
-        fields = fields + ['user_id','profile_image', 'first_name','last_name']
+        fields = fields + ["user_id", "profile_image", "first_name", "last_name"]
+
 
 class Swap(db.Model):
     __tablename__ = "swaps"
@@ -232,11 +317,16 @@ class Swap(db.Model):
     created_at = db.Column(db.String(50), nullable=True)
     updated_at = db.Column(db.String(50), nullable=True)
 
+
 class SwapSchema(ma.Schema):
     class Meta:
-        fields = [prop.key for prop in class_mapper(Swap).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
-        fields = fields + ['first_name', 'last_name', 'swap_requests']
+        fields = [
+            prop.key
+            for prop in class_mapper(Swap).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+        fields = fields + ["first_name", "last_name", "swap_requests"]
+
 
 class Rating(db.Model):
     __tablename__ = "ratings"
@@ -249,10 +339,15 @@ class Rating(db.Model):
     rating = db.Column(db.Float, default=0.0)
     review = db.Column(db.Text, nullable=True)
 
+
 class RatingSchema(ma.Schema):
     class Meta:
-        fields = [prop.key for prop in class_mapper(Rating).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+        fields = [
+            prop.key
+            for prop in class_mapper(Rating).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+
 
 class Follow(db.Model):
     __tablename__ = "follows"
@@ -264,37 +359,44 @@ class Follow(db.Model):
     is_user_followed = db.Column(db.Integer, default=0)
     rating = db.Column(db.Float, default=0.0)
 
+
 class FollowSchema(ma.Schema):
     class Meta:
-        fields = [prop.key for prop in class_mapper(Follow).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
-        fields = fields + ['user_id','profile_image', 'first_name','last_name','is_followed','user_followers','users_followed']
+        fields = [
+            prop.key
+            for prop in class_mapper(Follow).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+        fields = fields + [
+            "user_id",
+            "profile_image",
+            "first_name",
+            "last_name",
+            "is_followed",
+            "user_followers",
+            "users_followed",
+        ]
 
-
-class Player(db.Model):
-    __tablename__ = "players"
-    player_id = db.Column(db.Integer, primary_key=True)
-    player_name = db.Column(db.String(200), nullable=False)
-    club_id = db.Column(db.Integer, default=0)
-    email = db.Column(db.String(200), nullable=False)
-    player_profile_pic = db.Column(db.Text, nullable=True)
-    player_cover_pic = db.Column(db.Text, nullable=True)
-    web_link = db.Column(db.Text, nullable=True)
-    fb_link = db.Column(db.Text, nullable=True)
-    twitter_link = db.Column(db.Text, nullable=True)
-    instagram_link = db.Column(db.Text, nullable=True)
-    whatsapp_number = db.Column(db.String(50), nullable=True)
-    address = db.Column(db.Text, nullable=True)
-    postal_address = db.Column(db.String(100), nullable=True)
-    fb_followers = db.Column(db.Integer, nullable=True)
-    twitter_followers = db.Column(db.Integer, nullable=True)
-    insta_followers = db.Column(db.Integer, nullable=True)
 
 class PlayerSchema(ma.Schema):
     class Meta:
-        fields = [prop.key for prop in class_mapper(Player).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
-        fields = fields + ['user_id','profile_image', 'first_name','last_name','is_followed','followers', 'club_name','total_reviews','country_name']
+        fields = [
+            prop.key
+            for prop in class_mapper(Player).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+        fields = fields + [
+            "user_id",
+            "profile_image",
+            "first_name",
+            "last_name",
+            "is_followed",
+            "followers",
+            "club_name",
+            "total_reviews",
+            "country_name",
+        ]
+
 
 class Notification(db.Model):
     __tablename__ = "notifications"
@@ -309,6 +411,53 @@ class Notification(db.Model):
     updated_at = db.Column(db.String(50), nullable=True)
 
 
+class ChatParticipants(db.Model):
+    __tablename__ = "chat_participants"
+    p_id = db.Column(db.Integer, primary_key=True)
+    chat_initiater_id = db.Column(db.Integer, default=0)
+    chat_initiated_with_id = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.String(50), default=str(datetime.now()))
 
 
+class Messages(db.Model):
+    __tablename__ = "messages"
+    msg_id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, default=0)
+    receiver_id = db.Column(db.Integer, default=0)
+    message = db.Column(db.Text, nullable=False)
+    media = db.Column(db.Text, nullable=True)
+    p_id = db.Column(db.Integer, default=0)
+    is_read = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.String(50), default=str(datetime.now()))
 
+
+class ChatSchema(ma.Schema):
+    class Meta:
+        fields = [
+            prop.key
+            for prop in class_mapper(ChatParticipants).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+
+        fields = fields + [
+            prop.key
+            for prop in class_mapper(Messages).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+
+        fields = [
+            prop.key
+            for prop in class_mapper(User).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+        # fields = fields + [
+        #     "user_id",
+        #     "profile_image",
+        #     "first_name",
+        #     "last_name",
+        #     "is_followed",
+        #     "followers",
+        #     "club_name",
+        #     "total_reviews",
+        #     "country_name",
+        # ]

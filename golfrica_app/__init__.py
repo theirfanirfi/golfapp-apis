@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from Config import Config
 from flask_marshmallow import Marshmallow
+
 app = Flask(__name__)
 
 db = SQLAlchemy(app)
@@ -15,10 +16,10 @@ bcrypt = Bcrypt()
 app = Flask(__name__)
 app.config.from_object(Config)
 
-#filters
-app.jinja_env.filters['str'] = str()
+# filters
+app.jinja_env.filters["str"] = str()
 
-#initializations
+# initializations
 db.app = app
 db.init_app(app)
 bcrypt.init_app(app)
@@ -34,6 +35,7 @@ from golfrica_app.Views.Statuses.Swap import Swap
 from golfrica_app.Views.Clubs.Rating import Rating
 from golfrica_app.Views.Clubs.Follow import Follow
 from golfrica_app.Views.Players.Player import Player
+from golfrica_app.Views.ServingStaticFiles.Files import Files
 
 
 migrate = Migrate(app, db)
@@ -48,5 +50,4 @@ Swap.register(app)
 Rating.register(app)
 Follow.register(app)
 Player.register(app)
-
-
+Files.register(app)
