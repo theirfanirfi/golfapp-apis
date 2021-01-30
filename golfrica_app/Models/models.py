@@ -67,6 +67,7 @@ class UserSchema(ma.Schema):
             for prop in class_mapper(User).iterate_properties
             if isinstance(prop, sqlalchemy.orm.ColumnProperty)
         ]
+        fields = fields + ["followers"]
 
 
 class LoginDevice(db.Model):
@@ -428,6 +429,7 @@ class Messages(db.Model):
     media = db.Column(db.Text, nullable=True)
     p_id = db.Column(db.Integer, default=0)
     is_read = db.Column(db.Integer, default=0)
+    is_forwarded = db.Column(db.Integer, default=0)
     created_at = db.Column(db.String(50), default=str(datetime.now()))
 
 
@@ -445,19 +447,23 @@ class ChatSchema(ma.Schema):
             if isinstance(prop, sqlalchemy.orm.ColumnProperty)
         ]
 
-        fields = [
+        fields = fields + [
             prop.key
             for prop in class_mapper(User).iterate_properties
             if isinstance(prop, sqlalchemy.orm.ColumnProperty)
         ]
-        # fields = fields + [
-        #     "user_id",
-        #     "profile_image",
-        #     "first_name",
-        #     "last_name",
-        #     "is_followed",
-        #     "followers",
-        #     "club_name",
-        #     "total_reviews",
-        #     "country_name",
-        # ]
+        fields = fields + [
+            "initiater_username",
+            "initiated_with_username",
+            "i_am_intitiater",
+            "initiater_profile_image",
+            "initiated_with_profile_image",
+            "last_message",
+            "unread_msgs",
+            "_id",
+            "text",
+            "createdAt",
+            "user",
+            "name",
+            "avatar",
+        ]

@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from Config import Config
 from flask_marshmallow import Marshmallow
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="/static")
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -36,6 +36,8 @@ from golfrica_app.Views.Clubs.Rating import Rating
 from golfrica_app.Views.Clubs.Follow import Follow
 from golfrica_app.Views.Players.Player import Player
 from golfrica_app.Views.ServingStaticFiles.Files import Files
+from golfrica_app.Views.Chat.Chat import Chat
+from golfrica_app.Views.User.UserView import UserView
 
 
 migrate = Migrate(app, db)
@@ -51,3 +53,5 @@ Rating.register(app)
 Follow.register(app)
 Player.register(app)
 Files.register(app)
+Chat.register(app)
+UserView.register(app)

@@ -18,7 +18,7 @@ from golfrica_app.Models.models import (
 
 class MF:
     @staticmethod
-    def getSchema(blName):
+    def getModel(blName):
         if blName == "status":
             return Status()
         elif blName == "club":
