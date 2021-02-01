@@ -18,8 +18,8 @@ class AlchemyEncoder(json.JSONEncoder):
                 x
                 for x in dir(obj)
                 if not x.startswith("_")
-                and x != "metadata"
-                and not x.startswith("query")
+                   and x != "metadata"
+                   and not x.startswith("query")
             ]:
                 data = obj.__getattribute__(field)
                 try:
@@ -185,6 +185,30 @@ class ClubDesSchema(ma.Schema):
         fields = fields + ["first_name", "last_name", "profile_image"]
 
 
+class Swap(db.Model):
+    __tablename__ = "swaps"
+    swap_id = db.Column(db.Integer, primary_key=True)
+    is_status = db.Column(db.Integer, default=0)
+    is_player = db.Column(db.Integer, default=0)
+    is_club = db.Column(db.Integer, default=0)
+
+    swaper_id = db.Column(db.Integer, default=0)
+    swaped_with_id = db.Column(db.Integer, default=0)
+
+    status_id = db.Column(db.Integer, default=0)
+    player_id = db.Column(db.Integer, default=0)
+    club_id = db.Column(db.Integer, default=0)
+
+    is_accepted = db.Column(db.Integer, default=0)
+    is_rejected = db.Column(db.Integer, default=0)
+    is_expired = db.Column(db.Integer, default=0)
+    is_reviewed = db.Column(db.Integer, default=0)
+    review_rating = db.Column(db.Integer, default=0)
+    review_desc = db.Column(db.Text, default=0)
+    created_at = db.Column(db.String(50), nullable=True)
+    updated_at = db.Column(db.String(50), nullable=True)
+
+
 class StatusSchema(ma.Schema):
     class Meta:
         fields = [
@@ -207,7 +231,13 @@ class StatusSchema(ma.Schema):
             for prop in class_mapper(Player).iterate_properties
             if isinstance(prop, sqlalchemy.orm.ColumnProperty)
         ]
-        fields = fields + ["total_likes", "total_swaps", "total_comments", "avg_rating"]
+        fields = fields + [
+            prop.key
+            for prop in class_mapper(Swap).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+        fields = fields + ["total_likes", "total_swaps", "total_comments", "avg_rating", "timer", "isMe",
+                           "status_posting_time","swaper_obj","swaped_with_obj"]
 
 
 class Country(db.Model):
@@ -293,30 +323,6 @@ class CommentSchema(ma.Schema):
         ]
 
         fields = fields + ["user_id", "profile_image", "first_name", "last_name"]
-
-
-class Swap(db.Model):
-    __tablename__ = "swaps"
-    swap_id = db.Column(db.Integer, primary_key=True)
-    is_status = db.Column(db.Integer, default=0)
-    is_player = db.Column(db.Integer, default=0)
-    is_club = db.Column(db.Integer, default=0)
-
-    swaper_id = db.Column(db.Integer, default=0)
-    swaped_with_id = db.Column(db.Integer, default=0)
-
-    status_id = db.Column(db.Integer, default=0)
-    player_id = db.Column(db.Integer, default=0)
-    club_id = db.Column(db.Integer, default=0)
-
-    is_accepted = db.Column(db.Integer, default=0)
-    is_rejected = db.Column(db.Integer, default=0)
-    is_expired = db.Column(db.Integer, default=0)
-    is_reviewed = db.Column(db.Integer, default=0)
-    review_rating = db.Column(db.Integer, default=0)
-    review_desc = db.Column(db.Text, default=0)
-    created_at = db.Column(db.String(50), nullable=True)
-    updated_at = db.Column(db.String(50), nullable=True)
 
 
 class SwapSchema(ma.Schema):

@@ -1,27 +1,24 @@
 from flask import jsonify, request
 from flask_classful import FlaskView, route
-
-from golfrica_app.BusinessLogic.CommentBL import CommentBL
-from golfrica_app.BusinessLogic.UsersBL import UsersBL
-from golfrica_app.BusinessLogic.SwapBL import SwapBL
-from golfrica_app.BusinessLogic.StatusesBL import StatusesBL
+from golfrica_app.Factories.BLFactory import BL
 from golfrica_app.Globals.JSONResponses import AuthorizeRequest, notLoggedIn, dataSavedResponse,\
     dataNotSavedResponse, get_decoded
 class Swap(FlaskView):
     response = dict({"isLoggedIn": True})
-    bl = SwapBL()
-    ubl = UsersBL()
-    sbl = StatusesBL()
     def index(self):
-        pass
+        user = AuthorizeRequest(request.headers)
+        if not user:
+            return jsonify(notLoggedIn)
 
+        swaps = BL.getBL("swap").getSwaps(user)
+        return jsonify(swaps)
 
     def get(self, id):
         user = AuthorizeRequest(request.headers)
         if not user:
             return jsonify(notLoggedIn)
 
-        self.response.update({"country": self.bl.getCountryById(id)})
+        self.response.update({"country": BL.getBL("swap").getCountryById(id)})
         return jsonify(self.response)
 
     @route("/status/<int:status_id>/")
@@ -29,7 +26,7 @@ class Swap(FlaskView):
         user = AuthorizeRequest(request.headers)
         if not user:
             return jsonify(notLoggedIn)
-        isFound, status = self.sbl.getStatusByIdObject(status_id)
+        isFound, status = BL.getBL("status").getStatusByIdObject(status_id)
         print(status.status_id)
 
         if not isFound:
@@ -39,7 +36,7 @@ class Swap(FlaskView):
                 'msg_type': 'error'
             })
 
-        isSwaped, message, msg_type = self.bl.swapStatus(user, status)
+        isSwaped, message, msg_type = BL.getBL("swap").swapStatus(user, status)
         self.response.update({
             "isSwaped": isSwaped,
             'message': message,
@@ -63,10 +60,9 @@ class Swap(FlaskView):
             })
             return jsonify(self.response)
 
-        statusObj = StatusesBL()
-        isFound, status = statusObj.getStatusByIdObject(data['status_id'])
+        isFound, status = BL.getBL("status").getStatusByIdObject(data['status_id'])
         if isFound:
-            isCommented, messageOrComment, msg_type = self.bl.commentStatus(user, status, data['comment'], data['rating'])
+            isCommented, messageOrComment, msg_type = BL.getBL("swap").commentStatus(user, status, data['comment'], data['rating'])
             self.response.update({
                 "isCommented": isCommented,
                 "messageOrComment": messageOrComment,
@@ -91,7 +87,7 @@ class Swap(FlaskView):
             return jsonify(notLoggedIn)
 
         form = request.form
-        isUpdated, countryOrException = self.bl.addCountry(form)
+        isUpdated, countryOrException = BL.getBL("swap").addCountry(form)
         if isUpdated:
             dataSavedResponse.update({"country": countryOrException})
             return jsonify(dataSavedResponse)
@@ -106,7 +102,7 @@ class Swap(FlaskView):
         if not user:
             return jsonify(notLoggedIn)
 
-        isSwapNotificationsFound, swaps = self.bl.getSwapNotifications(user)
+        isSwapNotificationsFound, swaps = BL.getBL("swap").getSwapNotifications(user)
         self.response.update({"isSwapNotificationsFound": isSwapNotificationsFound, "swaps": swaps})
         return jsonify(self.response)
 
@@ -115,12 +111,12 @@ class Swap(FlaskView):
         if not user:
             return jsonify(notLoggedIn)
 
-        swap = self.bl.getSwapObjectById(id)
+        swap = BL.getBL("swap").getSwapObjectById(id)
         if not swap:
             self.response.update({"isSwapApproved": False, "message": 'Swap not found.','msg_type': 'error'})
             return jsonify(self.response)
 
-        isSwapApproved, message, msg_type = self.bl.approveSwap(user, swap)
+        isSwapApproved, message, msg_type = BL.getBL("swap").approveSwap(user, swap)
         self.response.update({"isSwapApproved": isSwapApproved, "message": message, 'msg_type': msg_type})
         return jsonify(self.response)
 
@@ -129,11 +125,11 @@ class Swap(FlaskView):
         if not user:
             return jsonify(notLoggedIn)
 
-        swap = self.bl.getSwapObjectById(id)
+        swap = BL.getBL("swap").getSwapObjectById(id)
         if not swap:
             self.response.update({"isSwapDeclined": False, "message": 'Swap not found.','msg_type': 'error'})
             return jsonify(self.response)
 
-        isSwapDeclined, message, msg_type = self.bl.declineSwap(user, swap)
+        isSwapDeclined, message, msg_type = BL.getBL("swap").declineSwap(user, swap)
         self.response.update({"isSwapDeclined": isSwapDeclined, "message": message, 'msg_type': msg_type})
         return jsonify(self.response)
