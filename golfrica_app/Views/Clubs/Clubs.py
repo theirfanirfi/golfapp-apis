@@ -26,6 +26,16 @@ class Clubs(FlaskView):
         self.response.update({"clubs": BL.getBL("club").getClubs(user)})
         return jsonify(self.response)
 
+    @route("/country_clubs/<int:id>/")
+    def country_clubs(self, id):
+        print('working')
+        user = AuthorizeRequest(request.headers)
+        if not user:
+            return jsonify(notLoggedIn)
+
+        self.response.update({"clubs": BL.getBL("club").getClubsByCountryForTab(user, id)})
+        return jsonify(self.response)
+
     def get(self, id):
         user = AuthorizeRequest(request.headers)
         if not user:

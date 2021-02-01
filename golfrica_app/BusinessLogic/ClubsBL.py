@@ -19,6 +19,16 @@ class ClubsBL:
         clubs= db.engine.execute(sql)
         return self.cs.dump(clubs)
 
+    def getClubsByCountryForTab(self, user, country_id):
+        sql = text("SELECT clubs.*, count(f_id) as followers, "
+                   "count(ratings.rating_id) as total_reviews, "
+                   "avg(ratings.rating) as avg_rating, IF(follows.follower_id = "+str(user.user_id)+", true, false) as is_followed "
+                   "FROM clubs LEFT JOIN follows on follows.followed_id = clubs.club_id AND follows.is_club_followed = 1 "
+                   "LEFT JOIN ratings on ratings.club_id = clubs.club_id WHERE clubs.club_country="+str(country_id)+
+                   " GROUP BY clubs.club_id, follows.follower_id")
+        clubs= db.engine.execute(sql)
+        return self.cs.dump(clubs)
+
     def getClubsForSync(self):
         clubs= Club.query.all()
         return clubs
