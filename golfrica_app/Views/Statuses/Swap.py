@@ -5,7 +5,9 @@ from golfrica_app.Globals.JSONResponses import AuthorizeRequest, notLoggedIn, da
     dataNotSavedResponse, get_decoded
 class Swap(FlaskView):
     response = dict({"isLoggedIn": True})
+
     def index(self):
+        print(request.headers)
         user = AuthorizeRequest(request.headers)
         if not user:
             return jsonify(notLoggedIn)

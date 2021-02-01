@@ -96,8 +96,9 @@ class SwapBL:
 
     def getSwaps(self, user):
         current_time = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S %p"))
-        sql = text("SELECT statuses.*,swaps.*, clubs.club_id, clubs.club_name, clubs.club_profile_pic, players.player_id, players.player_name, players.player_profile_pic, "
+        sql = text("SELECT statuses.*,swaps.*, clubs.club_id as cclub_id, clubs.club_name , clubs.club_profile_pic, players.player_id, players.player_name, players.player_profile_pic, "
                    + "JSON_OBJECT('swaper_id',swaper.user_id, 'swaper_name', CONCAT(swaper.first_name,' ', swaper.last_name), 'swaper_profile_pic', swaper.profile_image) as swaper_obj,"
+                   + "JSON_OBJECT('poster_id',poster.user_id, 'poster_name', CONCAT(poster.first_name,' ', poster.last_name), 'poster_profile_pic', poster.profile_image) as poster_obj,"
                    + " JSON_OBJECT('swaped_with_id',swaped_with.user_id, 'swaped_with_name', CONCAT(swaped_with.first_name,' ', swaped_with.last_name), 'swaped_with_profile_pic', swaped_with.profile_image) as swaped_with_obj, "
                    + "time_to_sec(timediff('" + current_time + "',swaps.updated_at))/60 as timer, "
                    + "IF(swaps.swaper_id = " + str(user.user_id) + ",true,false) as isMe, "
@@ -110,8 +111,9 @@ class SwapBL:
                    + "LEFT JOIN statuses on statuses.status_id = swaps.status_id"
                    + " LEFT JOIN users as swaper on swaper.user_id = swaps.swaper_id"
                    + " LEFT JOIN users as swaped_with on swaped_with.user_id = swaps.swaped_with_id"
-                   + " LEFT JOIN clubs on clubs.club_id = swaps.club_id"
+                   + " LEFT JOIN clubs on clubs.club_id = statuses.club_id"
                    + " LEFT JOIN players on players.player_id = swaps.player_id "
+                   + " LEFT JOIN users as poster on poster.user_id = statuses.user_id "
                    + " where (swaps.swaper_id = " + str(user.user_id)
                    + " and time_to_sec(timediff('" + current_time + "',swaps.updated_at))/60 < 1440 and is_accepted = 0 and is_reviewed = 0) "
                    + "or (swaped_with_id = " + str(user.user_id)

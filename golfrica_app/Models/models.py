@@ -237,7 +237,7 @@ class StatusSchema(ma.Schema):
             if isinstance(prop, sqlalchemy.orm.ColumnProperty)
         ]
         fields = fields + ["total_likes", "total_swaps", "total_comments", "avg_rating", "timer", "isMe",
-                           "status_posting_time","swaper_obj","swaped_with_obj"]
+                           "status_posting_time","swaper_obj","swaped_with_obj", "cclub_id", "poster_obj"]
 
 
 class Country(db.Model):
