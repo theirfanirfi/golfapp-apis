@@ -1,10 +1,6 @@
 from flask import jsonify, request, escape
 from flask_classful import FlaskView, route
-from golfrica_app.Models.models import User
-from golfrica_app.BusinessLogic.FollowBL import FollowBL
-from golfrica_app.BusinessLogic.ClubsBL import ClubsBL
-from golfrica_app.BusinessLogic.UsersBL import UsersBL
-from golfrica_app.BusinessLogic.PlayerBL import PlayerBL
+from golfrica_app.Factories.BLFactory import  BL
 from golfrica_app.Globals.JSONResponses import (
     AuthorizeRequest,
     notLoggedIn,
@@ -18,10 +14,6 @@ from golfrica_app.Globals.JSONResponses import (
 
 class Follow(FlaskView):
     response = dict({"isLoggedIn": True})
-    fl = FollowBL()
-    cl = ClubsBL()
-    ubl = UsersBL()
-    pbl = PlayerBL()
 
     def index(self):
         pass
@@ -32,16 +24,16 @@ class Follow(FlaskView):
         if not user:
             return jsonify(notLoggedIn)
 
-        club = self.cl.getClubObjById(club_id)
+        club = BL.getBL("club").getClubObjById(club_id)
         if not club:
             return jsonify(invalidArgsResponse)
 
         if request.method == "GET":
-            followers = self.fl.getClubFollowers(club_id)
+            followers = BL.getBL("follow").getClubFollowers(club_id)
             self.response.update({"followers": followers})
             return jsonify(self.response)
         elif request.method == "POST":
-            isFollowed, message, msg_type = self.fl.followClub(user, club)
+            isFollowed, message, msg_type = BL.getBL("follow").followClub(user, club)
             self.response.update(
                 {"isFollowed": isFollowed, "message": message, "msg_type": msg_type}
             )
@@ -58,11 +50,11 @@ class Follow(FlaskView):
         user = AuthorizeRequest(request.headers)
         if not user:
             return jsonify(notLoggedIn)
-        player = self.pbl.getPlayerObjById(player_id)
+        player = BL.getBL("player").getPlayerObjById(player_id)
         if not player:
             return jsonify(invalidArgsResponse)
 
-        followers = self.fl.getPlayerFollowersForTab(user, player_id)
+        followers = BL.getBL("follow").getPlayerFollowersForTab(user, player_id)
         self.response.update({"followers": followers})
         return jsonify(self.response)
 
@@ -71,11 +63,11 @@ class Follow(FlaskView):
         user = AuthorizeRequest(request.headers)
         if not user:
             return jsonify(notLoggedIn)
-        club = self.cl.getClubObjById(club_id)
+        club = BL.getBL("club").getClubObjById(club_id)
         if not club:
             return jsonify(invalidArgsResponse)
 
-        followers = self.fl.getClubFollowersForTab(user, club_id)
+        followers = BL.getBL("follow").getClubFollowersForTab(user, club_id)
         self.response.update({"followers": followers})
         return jsonify(self.response)
 
@@ -85,11 +77,11 @@ class Follow(FlaskView):
         if not user:
             return jsonify(notLoggedIn)
 
-        isUserFound, user_to_follow = self.ubl.getUserObjectById(user_id)
+        isUserFound, user_to_follow = BL.getBL("user").getUserObjectById(user_id)
         if not isUserFound:
             return jsonify(invalidArgsResponse)
 
-        isFollowed, message, msg_type = self.fl.followUser(user, user_to_follow)
+        isFollowed, message, msg_type = BL.getBL("follow").followUser(user, user_to_follow)
         self.response.update(
             {"isFollowed": isFollowed, "message": message, "msg_type": msg_type}
         )
@@ -101,12 +93,21 @@ class Follow(FlaskView):
         if not user:
             return jsonify(notLoggedIn)
 
-        player_to_follow = self.pbl.getPlayerObjById(player_id)
+        player_to_follow = BL.getBL("player").getPlayerObjById(player_id)
         if not player_to_follow:
             return jsonify(invalidArgsResponse)
 
-        isFollowed, message, msg_type = self.fl.followPlayer(user, player_to_follow)
+        isFollowed, message, msg_type = BL.getBL("follow").followPlayer(user, player_to_follow)
         self.response.update(
             {"isFollowed": isFollowed, "message": message, "msg_type": msg_type}
         )
         return jsonify(self.response)
+
+    @route('/get_followed/')
+    def getFollowed(self):
+        user = AuthorizeRequest(request.headers)
+        if not user:
+            return jsonify(notLoggedIn)
+
+        followed = BL.getBL("follow").getFollowedUsers(user)
+        return jsonify(followed)

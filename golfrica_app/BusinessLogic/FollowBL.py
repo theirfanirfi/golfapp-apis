@@ -116,11 +116,11 @@ class FollowBL:
             "IF(follows.follower_id='"
             + str(user.user_id)
             + "', true, false) as is_followed,"
-            " (select count(f_id) FROM follows WHERE followed_id = users.user_id) as user_followers,"
-            " (select count(f_id) FROM follows WHERE follower_id = users.user_id) as users_followed "
-            "FROM follows "
-            "LEFT JOIN users on users.user_id = follows.follower_id "
-            "WHERE follows.followed_id = '"
+              " (select count(f_id) FROM follows WHERE followed_id = users.user_id) as user_followers,"
+              " (select count(f_id) FROM follows WHERE follower_id = users.user_id) as users_followed "
+              "FROM follows "
+              "LEFT JOIN users on users.user_id = follows.follower_id "
+              "WHERE follows.followed_id = '"
             + str(club_id)
             + "' AND is_club_followed = 1"
         )
@@ -134,14 +134,21 @@ class FollowBL:
             "IF(follows.follower_id='"
             + str(user.user_id)
             + "', true, false) as is_followed,"
-            " (select count(f_id) FROM follows WHERE followed_id = users.user_id) as user_followers,"
-            " (select count(f_id) FROM follows WHERE follower_id = users.user_id) as users_followed "
-            "FROM follows "
-            "LEFT JOIN users on users.user_id = follows.follower_id "
-            "WHERE follows.followed_id = '"
+              " (select count(f_id) FROM follows WHERE followed_id = users.user_id) as user_followers,"
+              " (select count(f_id) FROM follows WHERE follower_id = users.user_id) as users_followed "
+              "FROM follows "
+              "LEFT JOIN users on users.user_id = follows.follower_id "
+              "WHERE follows.followed_id = '"
             + str(player_id)
             + "' AND is_player_followed = 1"
         )
         player_followers = db.engine.execute(sql)
         player_followers = self.fs.dump(player_followers)
         return player_followers
+
+    def getFollowedUsers(self, user):
+        sql = text("SELECT follows.*, users.user_id, concat(users.first_name, ' ',users.last_name) as username, "
+                   + "users.profile_image FROM follows LEFT JOIN users on users.user_id = follows.`followed_id`"
+                   + " WHERE follower_id = "+str(user.user_id)+" AND is_user_followed = 1")
+        followed_users = db.engine.execute(sql)
+        return self.fs.dump(followed_users)

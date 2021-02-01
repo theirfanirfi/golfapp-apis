@@ -8,14 +8,14 @@ from golfrica_app.Factories.SchemaFactory import SF
 class SwapBL:
     ss = SwapSchema(many=True)
 
-    def swapStatus(self, user, status):
+    def swapStatus(self, user, status, swap_with=None):
         swaped_with = 0
         if status.is_app_status == 1:
-            swaped_with = status.user_id
+            swaped_with = status.user_id if swap_with is None else swap_with.user_id
         elif status.is_club_status == 1:
-            swaped_with = status.club_id
+            swaped_with = swap_with.user_id
         elif status.is_player_status == 1:
-            swaped_with = status.player_id
+            swaped_with = swap_with.user_id
         else:
             return False, 'Invalid status', 'error'
 

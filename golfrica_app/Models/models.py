@@ -382,6 +382,8 @@ class FollowSchema(ma.Schema):
             "is_followed",
             "user_followers",
             "users_followed",
+            "username",
+
         ]
 
 
