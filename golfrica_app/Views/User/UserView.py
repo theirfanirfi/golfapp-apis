@@ -1,9 +1,7 @@
 from flask import jsonify, request, escape
 from flask_classful import FlaskView, route
-from golfrica_app.Models.models import User
-from golfrica_app.BusinessLogic.PlayerBL import PlayerBL
-from golfrica_app.BusinessLogic.ClubsBL import ClubsBL
 from golfrica_app.Factories.BLFactory import BL
+from golfrica_app.Factories.SchemaFactory import SF
 from golfrica_app.Globals.JSONResponses import (
     AuthorizeRequest,
     notLoggedIn,
@@ -32,6 +30,16 @@ class UserView(FlaskView):
 
     #     self.response.update({"players": BL.getBL("player").getPlayers(user, club)})
     #     return jsonify(self.response)
+
+    @route("/my_profile/", methods=['GET', 'POST'])
+    def my_profile(self):
+        user = AuthorizeRequest(request.headers)
+        if not user:
+            return jsonify(notLoggedIn)
+        if request.method == "GET":
+            return jsonify(SF.getSchema("user", False).dump(user))
+        elif request.method == "POST":
+            pass
 
     @route("/profile/<int:user_id>")
     def player_profile(self, user_id):
