@@ -172,11 +172,11 @@ class Statuses(FlaskView):
                     time = millisec.replace(".", "")
                     image_name = user.first_name + str(user.user_id) + time + ".jpg"
                     media.append(image_name)
-                    image.save(
-                        os.path.join(
-                            app.config["UPLOAD_FOLDER"] + "/user/status/", image_name
-                        )
-                    )
+
+                    folder = os.path.join(app.root_path, 'static/user/status')
+                    file_path = os.path.join(folder, image_name)
+
+                    image.save(file_path)
                 data["media"] = {"images": media, "video": []}
             isStatusPosted, status = self.bl.addUserStatus(user, data)
             self.response.update({"isStatusPosted": isStatusPosted, "status": status})

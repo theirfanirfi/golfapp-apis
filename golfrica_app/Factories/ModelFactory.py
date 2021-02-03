@@ -1,19 +1,4 @@
-from golfrica_app.Models.models import (
-    Messages,
-    ChatParticipants,
-    User,
-    Player,
-    Club,
-    ClubDescription,
-    Comment,
-    Like,
-    Rating,
-    Swap,
-    Status,
-    Follow,
-    Country,
-    Messages,
-)
+from golfrica_app.Models.models import *
 
 
 class MF:
@@ -45,3 +30,5 @@ class MF:
             return Messages()
         elif blName == "participant":
             return ChatParticipants()
+        elif blName == "device":
+            return LoginDevice()

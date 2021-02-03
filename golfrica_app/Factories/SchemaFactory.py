@@ -1,17 +1,4 @@
-from golfrica_app.Models.models import (
-    ChatSchema,
-    UserSchema,
-    PlayerSchema,
-    ClubDesSchema,
-    ClubSchema,
-    CommentSchema,
-    LikeSchema,
-    RatingSchema,
-    SwapSchema,
-    StatusSchema,
-    FollowSchema,
-    CountrySchema,
-)
+from golfrica_app.Models.models import *
 
 
 class SF:
@@ -43,3 +30,5 @@ class SF:
             return ChatSchema(many=isMany)
         elif blName == "participant":
             return ChatSchema(many=isMany)
+        elif blName == "device":
+            return LoginDeviceSchema(many=isMany)

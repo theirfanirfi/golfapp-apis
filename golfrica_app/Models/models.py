@@ -49,15 +49,16 @@ class User(db.Model):
     created_at = db.Column(db.String(50), nullable=True)
     updated_at = db.Column(db.String(50), nullable=True)
 
-    def __init__(self, first_name, last_name, email, password, login_type):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self.password = bcrypt.generate_password_hash(password)
-        self.login_type = login_type
+    @staticmethod
+    def newUser(first_name, last_name, email, password, login_type):
+        user = User()
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.password = bcrypt.generate_password_hash(password)
+        user.login_type = login_type
+        return user
 
-    def __init__(self):
-        pass
 
 
 class UserSchema(ma.Schema):
@@ -78,14 +79,16 @@ class LoginDevice(db.Model):
     user_id = db.Column(db.Integer, default=0)
     created_at = db.Column(db.String(50), nullable=True)
     updated_at = db.Column(db.String(50), nullable=True)
-
-    def __init__(self, device_name, token, user_id, updated_at):
-        # token = str(datetime.now())+random(0,1000)+str(datetime.now())
-        self.token = bcrypt.generate_password_hash(token)
-        self.device_name = device_name
-        self.user_id = user_id
-        self.created_at = str(datetime.now())
-        self.updated_at = updated_at
+    @staticmethod
+    def newDevice(device_name, token, user_id):
+        today_time = str(datetime.now())
+        device = LoginDevice()
+        device.token = bcrypt.generate_password_hash(token)
+        device.device_name = "App" if device_name is None else device_name
+        device.user_id = user_id
+        device.created_at = today_time
+        device.updated_at = today_time
+        return device
 
 
 class LoginDeviceSchema(ma.Schema):

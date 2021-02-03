@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from Config import Config
 from flask_marshmallow import Marshmallow
 
-app = Flask(__name__, static_url_path="/static")
+app = Flask(__name__)
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)

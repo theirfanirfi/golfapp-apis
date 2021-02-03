@@ -7,4 +7,4 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CACHE_TYPE = None
     MYSQL_DATABASE_CHARSET = 'utf8mb4'
-    UPLOAD_FOLDER = './static'
+    UPLOAD_FOLDER = '/static'
