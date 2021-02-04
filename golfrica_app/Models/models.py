@@ -335,7 +335,7 @@ class SwapSchema(ma.Schema):
             for prop in class_mapper(Swap).iterate_properties
             if isinstance(prop, sqlalchemy.orm.ColumnProperty)
         ]
-        fields = fields + ["first_name", "last_name", "swap_requests"]
+        fields = fields + ["first_name", "last_name", "swap_requests","profile_image"]
 
 
 class Rating(db.Model):

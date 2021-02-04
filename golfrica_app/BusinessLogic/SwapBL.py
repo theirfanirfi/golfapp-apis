@@ -60,7 +60,7 @@ class SwapBL:
             return False, 'Swap not found'
 
     def getSwapObjectById(self, swap_id):
-        swap = Swap.query.filter_by(swap_id)
+        swap = Swap.query.filter_by(swap_id=swap_id)
         if swap.count() > 0:
             return swap.first()
         else:
@@ -115,9 +115,9 @@ class SwapBL:
                    + " LEFT JOIN players on players.player_id = swaps.player_id "
                    + " LEFT JOIN users as poster on poster.user_id = statuses.user_id "
                    + " where (swaps.swaper_id = " + str(user.user_id)
-                   + " and time_to_sec(timediff('" + current_time + "',swaps.updated_at))/60 < 1440 and is_accepted = 0 and is_reviewed = 0) "
+                   + " and time_to_sec(timediff('" + current_time + "',swaps.updated_at))/60 < 1440 and is_accepted = 1 and is_reviewed = 0) "
                    + "or (swaped_with_id = " + str(user.user_id)
-                   + " and time_to_sec(timediff('" + current_time + "',swaps.updated_at))/60 < 1440 and is_accepted = 0 and is_reviewed = 0)")
+                   + " and time_to_sec(timediff('" + current_time + "',swaps.updated_at))/60 < 1440 and is_accepted = 1 and is_reviewed = 0)")
         swaps = db.engine.execute(sql)
         swaps = SF.getSchema("status").dump(swaps)
         return swaps
