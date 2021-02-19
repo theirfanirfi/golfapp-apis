@@ -10,6 +10,7 @@ from golfrica_app.BusinessLogic.CommentBL import *
 from golfrica_app.BusinessLogic.UsersBL import *
 from golfrica_app.BusinessLogic.ChatBL import *
 from golfrica_app.BusinessLogic.ParticipantBL import *
+from golfrica_app.BusinessLogic.NotificationBL import NotificationBL
 
 
 class BL:
@@ -39,3 +40,5 @@ class BL:
             return ChatBL()
         elif blName == "participant":
             return ParticipantBL()
+        elif blName == "notification":
+            return NotificationBL()

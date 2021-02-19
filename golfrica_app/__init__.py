@@ -38,6 +38,7 @@ from golfrica_app.Views.Players.Player import Player
 from golfrica_app.Views.ServingStaticFiles.Files import Files
 from golfrica_app.Views.Chat.Chat import Chat
 from golfrica_app.Views.User.UserView import UserView
+from golfrica_app.Views.Notification.NotificationView import NotificationView
 
 
 migrate = Migrate(app, db)
@@ -55,3 +56,4 @@ Player.register(app)
 Files.register(app)
 Chat.register(app)
 UserView.register(app)
+NotificationView.register(app)

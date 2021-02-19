@@ -32,3 +32,5 @@ class SF:
             return ChatSchema(many=isMany)
         elif blName == "device":
             return LoginDeviceSchema(many=isMany)
+        elif blName == "notification":
+            return NotificationSchema(many=isMany)

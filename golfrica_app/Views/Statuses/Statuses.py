@@ -1,9 +1,9 @@
 from flask import jsonify, request
 from flask_classful import FlaskView, route
-from golfrica_app.Models.models import AlchemyEncoder
 from golfrica_app.BusinessLogic.StatusesBL import StatusesBL
 from golfrica_app.BusinessLogic.UsersBL import UsersBL
 from golfrica_app.BusinessLogic.CommentBL import CommentBL
+from golfrica_app.Factories.BLFactory import BL
 from golfrica_app.Globals.JSONResponses import (
     AuthorizeRequest,
     notLoggedIn,
@@ -71,7 +71,7 @@ class Statuses(FlaskView):
             return jsonify(notLoggedIn)
         isFound, status = self.bl.getStatusByIdObject(status_id)
         if isFound:
-            isLiked, message, msg_type = self.bl.likeStatus(user, status)
+            isLiked, message, msg_type = BL.getBL("like").likeStatus(user, status)
             self.response.update(
                 {"isLiked": isLiked, "message": message, "msg_type": msg_type}
             )
@@ -90,7 +90,7 @@ class Statuses(FlaskView):
         comment = request.form["comment"]
         isFound, status = self.bl.getStatusByIdObject(status_id)
         if isFound:
-            isCommented, message, msg_type = self.bl.commentStatus(
+            isCommented, message, msg_type = BL.getBL("comment").commentStatus(
                 user, status, comment
             )
             self.response.update(
@@ -113,7 +113,7 @@ class Statuses(FlaskView):
             return jsonify(notLoggedIn)
         isFound, status = self.bl.getStatusByIdObject(status_id)
         if isFound:
-            isRated, message, msg_type = self.bl.rateStatus(user, status, rating)
+            isRated, message, msg_type = BL.getBL("rating").rateStatus(user, status, rating)
             self.response.update(
                 {"isRated": isRated, "message": message, "msg_type": msg_type}
             )

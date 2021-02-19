@@ -32,3 +32,5 @@ class MF:
             return ChatParticipants()
         elif blName == "device":
             return LoginDevice()
+        elif blName == "notification":
+            return Notification()

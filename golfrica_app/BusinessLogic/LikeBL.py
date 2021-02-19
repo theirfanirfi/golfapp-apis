@@ -1,14 +1,12 @@
 from golfrica_app.Models.models import Like, LikeSchema
 from datetime import datetime
 from golfrica_app import db
-import json
-from golfrica_app.CoreClasses.Escape import *
-from sqlalchemy import text
-from flask import jsonify
+from golfrica_app.BusinessLogic.NotificationBL import NotificationBL
+
 class LikeBL:
     ss = LikeSchema(many=True)
 
-    def likeStatus(self,user, status):
+    def likeStatus(self, user, status):
         isLikeAlready = Like.query.filter_by(is_status=1, user_id=user.user_id, status_id=status.status_id)
         if isLikeAlready.count() > 0:
             return False, 'Status is already liked', 'info'
@@ -21,11 +19,15 @@ class LikeBL:
         try:
             db.session.add(like)
             db.session.commit()
+
+            if status.is_app_status == 1:
+                NotificationBL.notifyUser(user, "like", status)
+
             return True, self.getStatusAppLikes(status.status_id), 'success'
         except Exception as e:
             return False, str(e), 'error'
 
-    def unLikeStatus(self,user, status):
+    def unLikeStatus(self, user, status):
         like = Like.query.filter_by(is_status=1, user_id=user.user_id, status_id=status.status_id)
         if not like.count() > 0:
             return False, 'Status is not liked by you', 'info'
@@ -39,13 +41,3 @@ class LikeBL:
 
     def getStatusAppLikes(self, status_id):
         return Like.query.filter_by(status_id=status_id).count()
-
-
-
-
-
-
-
-
-
-

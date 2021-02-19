@@ -5,6 +5,7 @@ from flask import escape, jsonify
 from sqlalchemy import text
 from golfrica_app.CoreClasses.Escape import escape_string
 # from golfrica_app.BusinessLogic.StatusesBL import StatusesBL
+from golfrica_app.BusinessLogic.NotificationBL import NotificationBL
 class CommentBL:
     cs = CommentSchema(many=True)
     # sbl = StatusesBL()
@@ -21,6 +22,10 @@ class CommentBL:
         try:
             db.session.add(com)
             db.session.commit()
+
+            if status.is_app_status == 1:
+                NotificationBL.notifyUser(user, "review", status)
+
             return True, self.getCommentByIdWithUserDetails(com.comment_id), 'success'
         except Exception as e:
             return False, str(e), 'error'

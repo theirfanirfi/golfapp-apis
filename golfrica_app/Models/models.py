@@ -60,7 +60,6 @@ class User(db.Model):
         return user
 
 
-
 class UserSchema(ma.Schema):
     class Meta:
         fields = [
@@ -79,6 +78,7 @@ class LoginDevice(db.Model):
     user_id = db.Column(db.Integer, default=0)
     created_at = db.Column(db.String(50), nullable=True)
     updated_at = db.Column(db.String(50), nullable=True)
+
     @staticmethod
     def newDevice(device_name, token, user_id):
         today_time = str(datetime.now())
@@ -240,7 +240,7 @@ class StatusSchema(ma.Schema):
             if isinstance(prop, sqlalchemy.orm.ColumnProperty)
         ]
         fields = fields + ["total_likes", "total_swaps", "total_comments", "avg_rating", "timer", "isMe",
-                           "status_posting_time","swaper_obj","swaped_with_obj", "cclub_id", "poster_obj"]
+                           "status_posting_time", "swaper_obj", "swaped_with_obj", "cclub_id", "poster_obj"]
 
 
 class Country(db.Model):
@@ -335,7 +335,7 @@ class SwapSchema(ma.Schema):
             for prop in class_mapper(Swap).iterate_properties
             if isinstance(prop, sqlalchemy.orm.ColumnProperty)
         ]
-        fields = fields + ["first_name", "last_name", "swap_requests","profile_image"]
+        fields = fields + ["first_name", "last_name", "swap_requests", "profile_image"]
 
 
 class Rating(db.Model):
@@ -421,6 +421,21 @@ class Notification(db.Model):
     to_be_notified_user_id = db.Column(db.Integer, default=0)
     created_at = db.Column(db.String(50), nullable=True)
     updated_at = db.Column(db.String(50), nullable=True)
+
+
+class NotificationSchema(ma.Schema):
+    class Meta:
+        fields = [
+            prop.key
+            for prop in class_mapper(Notification).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+        fields = fields + [
+            "user_id",
+            "profile_image",
+            "first_name",
+            "last_name",
+        ]
 
 
 class ChatParticipants(db.Model):
